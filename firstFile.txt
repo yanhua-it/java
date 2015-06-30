@@ -1,0 +1,258 @@
+登录 | 注册
+
+luckyyulin的专栏
+目录视图摘要视图订阅
+上微信头条，C币就是你的     博客专家庄晓立：我为什么要选择Rust？     最流行的语言想学就学     写博文，传代码，赚C币    
+ git学习——上传项目代码到github
+分类： github 2014-03-12 14:49 11079人阅读 评论(0) 收藏 举报
+github
+目录(?)[+]
+ 1.注册账户以及创建仓库
+     要想使用github第一步当然是注册github账号了。之后就可以创建仓库了（免费用户只能建公共仓库），Create a New Repository，填好名称后Create，之后会出现一些仓库的配置信息，这也是一个git的简单教程。
+
+     2.安装客户端tortoiseGit
+     github是服务端，要想在自己电脑上使用git我们还需要一个git客户端，我这里选用TortoiseGit，他给我们提供了图形界面的操作。在安装之前首先需要安装git，下载地址http://msysgit.github.com/，TortoiseGit下载地址：
+     http://code.google.com/p/tortoisegit/
+     装完后右键鼠标会多出一些选项来，在本地仓库里右键选择Git Init Here，会多出来一个.git文件夹，这就表示本地git创建成功。右键Git Bash进入git命令行，为了把本地的仓库传到github，还需要配置ssh key。
+
+     3.配置Git
+     （1） 首先在本地创建ssh key；
+    $ ssh-keygen -t rsa -C "your_email@youremail.com"
+ 后面的your_email@youremail.com改为你的邮箱，之后会要求确认路径和输入密码，我们这使用默认的一路回车就行。成功的话会在~/下生成.ssh文件夹，进去，打开id_rsa.pub，复制里面的key。回到github，进入Account Settings，左边选择SSH Keys，Add SSH Key,title随便填，粘贴key。
+
+ 
+ （2）为了验证是否成功，在git bash下输入：
+    $ ssh -T git@github.com 
+ 如果是第一次的会提示是否continue，输入yes就会看到：You’ve successfully authenticated, but GitHub does not provide shell access 。这就表示已成功连上github。
+
+ 
+ 
+ 
+ 
+ 
+ （3）接下来我们要做的就是把本地仓库传到github上去，在此之前还需要设置username和email，因为github每次commit都会记录他们。
+ $ git config --global user.name "your name" 
+ $ git config --global user.name "your name"$ git config --global user.email "your_email@youremail.com"
+ （4）进入要上传的仓库，右键git bash，添加远程地址：
+  $ git remote add origin git@github.com:yourName/yourRepo.git
+ 后面的yourName和yourRepo表示你再github的用户名和刚才新建的仓库，加完之后进入.git，打开config，这里会多出一个remote “origin”内容，这就是刚才添加的远程地址，也可以直接修改config来配置远程地址。
+ 
+    4.提交、上传
+  （1）接下来在本地仓库里添加一些文件，比如README，
+   $ git add README
+   $ git add README$ git commit -m "first commit" 
+   （2）上传到github：
+   $ git push origin master 
+   git push命令会将本地仓库推送到远程服务器。
+   git pull命令则相反。
+   修改完代码后，使用git status可以查看文件的差别，使用git add 添加要commit的文件，也可以用git add -i来智能添加文件。之后git commit提交本次修改，git push上传到github。
+ 
+  5.gitignore文件
+ .gitignore顾名思义就是告诉git需要忽略的文件，这是一个很重要并且很实用的文件。一般我们写完代码后会执行编译、调试等操作，这期间会产生很多中间文件和可执行文件，这些都不是代码文件，是不需要git来管理的。我们在git status的时候会看到很多这样的文件，如果用git add -A来添加的话会把他们都加进去，而手动一个个添加的话也太麻烦了。这时我们就需要.gitignore了。比如一般c#的项目我的.gitignore是这样写的：
+bin
+.suo
+obj
+bin和obj是编译目录，里面都不是源代码，忽略；suo文件是vs2010的配置文件，不需要。这样你在git status的时候就只会看到源代码文件了，就可以放心的git add -A了。
+6.tag
+
+我们可以创建一个tag来指向软件开发中的一个关键时期，比如版本号更新的时候可以建一个“v2.0”、“v3.1”之类的标签，这样在以后回顾的时候会比较方便。tag的使用很简单，主要操作有：查看tag、创建tag、验证tag以及共享tag。
+
+6.1查看tag
+列出所有tag：
+
+
+1
+
+git
+ tag
+这样列出的tag是按字母排序的，和创建时间没关系。如果只是想查看某些tag的话，可以加限定：
+
+
+1
+
+git
+ tag -l v1.*
+这样就只会列出1.几的版本。
+
+6.2创建tag
+创建轻量级tag：
+
+
+1
+
+git
+ tag v1.0
+这样创建的tag没有附带其他信息，与之相应的是带信息的tag：
+
+
+1
+
+git
+ tag -a v1.0 -m 'first
+ version'
+-m后面带的就是注释信息，这样在日后查看的时候会很有用，这种是普通tag，还有一种有签名的tag：
+
+
+1
+
+git
+ tag -s v1.0 -m 'first
+ version'
+前提是你有GPG私钥，把上面的a换成s就行了。除了可以为当前的进度添加tag，我们还可以为以前的commit添加tag：
+
+
+1
+
+2
+
+3
+
+4
+
+5
+
+#首先查看以前的commit
+
+git
+ log --oneline 
+
+#假如有这样一个commit：8a5cbc2
+ updated readme
+
+#这样为他添加tag
+
+git
+ tag -a v1.1 8a5cbc2
+6.3删除tag
+很简单，知道tag名称后：
+
+
+1
+
+git
+ tag -d v1.0
+6.4验证tag
+如果你有GPG私钥的话就可以验证tag：
+
+
+1
+
+git
+ tag -v
+
+v1.0
+6.5共享tag
+我们在执行git push的时候，tag是不会上传到服务器的，比如现在的github，创建tag后git push，在github网页上是看不到tag的，为了共享这些tag，你必须这样：
+
+
+1
+
+git
+ push origin --tags
+
+
+上一篇jQuery源码之创建jQuery对象
+下一篇github
+主题推荐githubgitcolorrgb
+猜你在找
+零基础学Java系列从入门到精通微信公众平台深度开发(Java版)反编译Android应用【深入理解计算机网络】入门必备的计算机网络基础视频课程（上）微信平台二次开发入门
+见过最好的git入门教程express解析http请求Eclipse ADT插件和Android SDK使用离线包升级笔记利用ScheduledThreadPoolExecutor定时执行任务Android Service 详解四开始停止service
+准备好了么？ 跳吧             ！更多职位尽在 CSDN JOB
+高级数据架构师——Hadoop
+猎上网络科技（上海）有限公司|35-40K/月我要跳槽
+项目经理
+杭州天迈网络有限公司|7-10K/月我要跳槽
+项目经理-电信事业部
+北京合力亿捷科技股份有限公司|8-12K/月我要跳槽
+项目经理
+北京华宇信息技术有限公司|8-16K/月我要跳槽
+
+查看评论
+
+  暂无评论
+
+您还没有登录,请[登录]或[注册]
+* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场
+
+核心技术类目
+全部主题 Hadoop AWS 移动游戏 Java Android iOS Swift 智能硬件 Docker OpenStack VPN Spark ERP IE10 Eclipse CRM JavaScript 数据库 Ubuntu NFC WAP jQuery BI HTML5 Spring Apache .NET API HTML SDK IIS Fedora XML LBS Unity Splashtop UML components Windows Mobile Rails QEMU KDE Cassandra CloudStack FTC coremail OPhone CouchBase 云计算 iOS6 Rackspace Web App SpringSide Maemo Compuware 大数据 aptech Perl Tornado Ruby Hibernate ThinkPHP HBase Pure Solr Angular Cloud Foundry Redis Scala Django Bootstrap
+个人资料
+ 访问我的空间 
+luckyyulin
+ 
+访问：59075次
+积分：1149
+等级： 
+排名：第19274名
+原创：56篇转载：20篇译文：0篇评论：3条
+文章搜索
+
+文章分类
+Linux(6)
+nginx(1)
+Chrome(2)
+j2ee(8)
+android(1)
+android自动化测试(2)
+robotium(5)
+node.js(3)
+bootstrap(2)
+kissy(1)
+资源(1)
+hosts(1)
+测试(1)
+快捷键(2)
+编辑器(3)
+python(16)
+hadoop(1)
+翻墙(2)
+jQuery(3)
+JavaScript(2)
+jQuery源码(2)
+正则表达式(1)
+github(2)
+ubuntu(6)
+浏览器(1)
+前端(2)
+文章存档
+2014年11月(1)
+2014年05月(1)
+2014年04月(12)
+2014年03月(19)
+2014年02月(39)
+展开
+阅读排行
+git学习——上传项目代码到github(11055)
+chrome浏览器调试JS代码(3634)
+Jquery获取当前屏幕的宽度、高度(3271)
+ubuntu创建桌面启动器的方法(2917)
+nginx rewrite 的语法(2594)
+github(2307)
+robotium自动化测试简介(2291)
+Robotium API 翻译（三）——判断测试结果的方法assert、is、search(2265)
+Robotium API 翻译（五）——web控件测试方法，WebElement和By类(1905)
+jQuery源码之创建jQuery对象(1802)
+评论排行
+robotium自动化测试简介(1)
+The Best BootStrap Resources(1)
+Robotium学习(1)
+sublime text2(0)
+GoAgent(0)
+浏览器设置代理(0)
+jQuery学习笔记(0)
+chrome浏览器调试JS代码(0)
+jQuery源码学习之总体架构(0)
+hadoop学习笔记(0)
+推荐文章
+
+最新评论
+robotium自动化测试简介
+siyulanyu: 我写了一个很简单的程序，用robotium框架，test方法看着都没自动调用呢，看JUnit下，Ru...
+Robotium学习
+Cloud_Huan: 谢谢楼主 我很无耻收下你的知识了 还想着自己慢慢模api 有你的文章节省不少时间了 :)
+The Best BootStrap Resources
+hu_zhuang163: 谢谢
+公司简介|招贤纳士|广告服务|银行汇款帐号|联系方式|版权声明|法律顾问|问题报告|合作伙伴|论坛反馈
+网站客服杂志客服微博客服webmaster@csdn.net400-600-2320|北京创新乐知信息技术有限公司 版权所有|江苏乐知网络技术有限公司 提供商务支持
+京 ICP 证 070598 号|Copyright ? 1999-2014, CSDN.NET, All Rights Reserved GongshangLogo
+  
